@@ -30,8 +30,8 @@ $ErrorActionPreference = 'Stop'
 # valid values: Stop, Inquire, Continue, SilentlyContinue (default)
 # $DebugPreference = 'Continue'
 
-$PSScriptRoot = "c:\data\dev\git\markg\browser_tabs\"
-. ($PSScriptRoot + "windowprops2.ps1")
+$module_directory = ".\"
+. ($module_directory + "windowprops2.ps1")
 
 
 # #################################
