@@ -39,7 +39,7 @@ function Get-Windows {
                 $script:windows += [PSCustomObject]@{
                     Handle = $hWnd
                     Title  = $title.ToString()
-                    PID = $mypid
+                    PID    = $mypid
                 }
                 # Write-Output "Window Found: Handle = $hWnd, Title = $($title.ToString())"
             }
@@ -57,3 +57,42 @@ function Get-Windows {
 
     return $windowProperties
 }
+
+function Get-Windows2 {
+
+    # Get window properties
+    $windowProperties = Get-WindowInfo
+
+    # Display the window properties
+    # $windowProperties | Format-Table -AutoSize
+
+    return $windowProperties
+}
+
+function Get-WindowInfo {
+    # Define a script block to get window properties
+    $script:windows = @()
+    $callback = [myUser32+EnumWindowsProc] {
+        param ($hWnd, $lParam)
+        
+        $title = New-Object System.Text.StringBuilder 256
+        [myUser32]::GetWindowText($hWnd, $title, $title.Capacity) | Out-Null
+        # Write-Host "Window Found: Handle = $hWnd, Title = $($title.ToString())"
+
+        if ($title.ToString() -ne "" -and [myUser32]::IsWindowVisible($hWnd)) {
+            $mypid = 0
+            [myUser32]::GetWindowThreadProcessId($hWnd, [ref]$mypid)
+            $script:windows += [PSCustomObject]@{
+                Handle = $hWnd
+                Title  = $title.ToString()
+                PID    = $mypid
+            }
+            # Write-Output "Window Found: Handle = $hWnd, Title = $($title.ToString())"
+        }
+        return $true
+    }
+    $null = [myUser32]::EnumWindows($callback, [IntPtr]::Zero)
+    return $script:windows
+
+}
+

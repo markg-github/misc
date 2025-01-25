@@ -11,6 +11,7 @@
 
   .NOTES
   Modified Date:  Nov 5, 2024
+  Jan 8, 2025 - sort workspace names
 #>
 
 param (
@@ -43,6 +44,8 @@ $module_directory = ".\"
 
 
 # Define a function to get workspace names from a profile
+# this is brittle since, as they say at intel, it relies on non-architectural properties,
+# the existence, location and format of the cache file
 function Get-Workspaces {
     
     $PreferencesPath = Join-Path -Path $workspace_directory -ChildPath $workspace_profile
@@ -60,6 +63,7 @@ function Get-Workspaces {
     return @()
 }
 
+# unused
 function Get-WindowTitles {
     param($process)
     $edges = Get-Process -Name $process
@@ -70,6 +74,7 @@ function Get-WindowTitles {
     return $titles
 }
 
+# unused
 function Get-Processes {
     param($process)
     $edges = Get-Process -Name $process
@@ -78,14 +83,24 @@ function Get-Processes {
 
 
 
-# Initialize an array to store workspace names
+# Initialize an array to store workspace objects
+# necessary?
 $Workspaces = @()
-$workspace_names = @()
 
 $workspaces = Get-Workspaces 
-foreach ($ws in $workspaces) {
-    $workspace_names += $ws.name
-}
+
+$workspaces = $workspaces | Sort-Object -Property name
+
+# unused
+# $workspace_names = @()
+# foreach ($ws in $workspaces) {
+#     $workspace_names += $ws.name
+# }
+
+# sort by workspace name
+# unused
+# $workspace_names = $workspace_names | Sort-Object
+
 
 function Find-Workspace {
     param($name_, $windows_)
@@ -100,7 +115,7 @@ function Find-Workspace {
 }
 
 $windows = @()
-$windows = Get-Windows
+$windows = Get-Windows2
 # Get-Processes $process
 $output_array = @()
 
