@@ -20,7 +20,8 @@ param (
     [string] $workspace_profile = "Default",
     [string] $workspace_cachefile = "Workspaces\WorkspacesCache",
     [string] $process = "msedge",
-    [int] $max_count = 100
+    [int] $max_count = 100,
+    [switch] $sortbycount = $false
 )
 
 # one error at a time
@@ -89,7 +90,14 @@ $Workspaces = @()
 
 $workspaces = Get-Workspaces 
 
-$workspaces = $workspaces | Sort-Object -Property name
+if ($sortbycount) {
+    $workspaces = $workspaces | Sort-Object -Property count
+
+}
+else {
+    $workspaces = $workspaces | Sort-Object -Property name
+
+}
 
 # unused
 # $workspace_names = @()
