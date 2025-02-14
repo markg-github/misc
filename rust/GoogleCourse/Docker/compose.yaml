@@ -1,0 +1,10 @@
+
+services:
+  rust-app:
+    build:
+      context: . # Current directory as build context
+    volumes:
+      - ..:/usr/src/app # Mount the current directory to /app in the container
+    # command: /bin/bash
+    tty: true
+    stdin_open: true
