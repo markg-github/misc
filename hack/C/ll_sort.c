@@ -5,190 +5,106 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ll_node
+typedef struct _ll_node
 {
-    int value;
-    struct ll_node *next;
-};
+    int val;
+    struct _ll_node *next;
+} ll_node_t;
 
-struct ll_node *FindIntersection(struct ll_node *list1, struct ll_node *list2)
+// insertion sort
+ll_node_t *sortedInsert(ll_node_t *curr, ll_node_t *sorted)
 {
-    struct ll_node *p1 = list1, *p2;
-    while (NULL != p1)
+    // need to handle the case where curr needs to be at the beginning here 
+    // so that we can look ahead below
+    if (sorted == NULL || sorted->val >= curr->val)
     {
-        p2 = list2;
-        while (NULL != p2)
-        {
-            if (p1 == p2)
-            {
-                return p1;
-            }
-            p2 = p2->next;
-        }
-        p1 = p1->next;
-    }
-    return NULL;
-}
-
-struct ll_node *FindIntersection2(struct ll_node *list1, struct ll_node *list2)
-{
-    struct ll_node *p1 = list1, *p2;
-    unsigned count1 = 0, count2 = 0;
-
-    while (NULL != p1)
-    {
-        p1 = p1->next;
-        count1++;
-    }
-
-    p2 = list2;
-    while (NULL != p2)
-    {
-        p2 = p2->next;
-        count2++;
-    }
-
-    unsigned diff;
-    if (count1 >= count2)
-    {
-        diff = count1 - count2;
-        p1 = list1;
-        for (unsigned i = 0; i < diff; i++)
-        {
-            p1 = p1->next;
-        }
-        p2 = list2;
-    }
-    else
-    {
-        diff = count2 - count1;
-        p2 = list2;
-        for (unsigned i = 0; i < diff; i++)
-        {
-            p2 = p2->next;
-        }
-        p1 = list1;
-    }
-    while (NULL != p1)
-    {
-        if (p1 == p2)
-        {
-            return p1;
-        }
-        p1 = p1->next;
-        p2 = p2->next;
-    }
-    return NULL;
-}
-
-struct ll_node *FindIntersection3(struct ll_node *list1, struct ll_node *list2)
-{
-    if (NULL == list1 || NULL == list2)
-    {
-        return NULL;
-
-    }
-
-    struct ll_node *p1 = list1, *p2 = list2;
-    while (1)
-    {
-        if (p1 == p2)
-        {
-            return p1;
-        }
-        p1 = p1->next;
-        if (NULL == p1)
-        {
-            p1 = list2;
-        }
-        p2 = p2->next;
-        if (NULL == p2)
-        {
-            p2 = list1;
-        }
-    }
-}
-
-struct ll_node* sortedInsert(struct ll_node* curr, struct ll_node* sorted)
-{
-    if (sorted==NULL || sorted->val >= curr->val)
-    {
+        printf("insert %d at beginning\n", curr->val);
         curr->next = sorted;
-        sorted=curr;
+        sorted = curr;
     }
     else
     {
-        struct ll_node* curr2 = sorted;
-        while (curr2->next != NULL && curr2->next->val < curr->val)
+        ll_node_t *sorted_curr = sorted;
+
+        // you need to look ahead here so you can change the pointer that
+        // needs to point at curr
+        while (sorted_curr->next != NULL && sorted_curr->next->val < curr->val)
         {
-            curr2 = curr2->next;
+            sorted_curr = sorted_curr->next;
         }
-        curr->next=curr2->next;
-        curr2->next = curr;
+        if (sorted_curr->next == NULL) {
+            printf("insert %d at end\n", curr->val);
+        }
+        else {
+            printf("insert %d in middle\n", curr->val);
+        }
+        // now we know we're at the end (sorted_curr->next == NULL) or
+        // sorted_cur->val < curr->val and sorted_cur->next->val >= curr->val
+        curr->next = sorted_curr->next;
+        sorted_curr->next = curr;
     }
     return sorted;
 }
 
-void ll_sort(struct ll_node* root, unsigned order)
+ll_node_t* ll_sort(ll_node_t *root, unsigned order)
 {
 
-    struct ll_node* sorted = NULL;
-    struct ll_node* curr = root;
+    ll_node_t *sorted = NULL;
+    ll_node_t *curr = root;
     if (order)
     {
-    while (curr != NULL)
-    {
-        struct ll_node* next=curr->next;
-        sorted=sortedInsert(curr, sorted);
-        curr = next;
-    }
-
+        while (curr != NULL)
+        {
+            ll_node_t *next = curr->next;
+            sorted = sortedInsert(curr, sorted);
+            curr = next;
+        }
     }
     else
     {
-
     }
     return sorted;
 }
 
 int main(int argc, char **argv)
 {
-    struct ll_node *p3 = (struct ll_node *)malloc(sizeof(struct ll_node));
-    struct ll_node *p6 = (struct ll_node *)malloc(sizeof(struct ll_node));
-    struct ll_node *p9 = (struct ll_node *)malloc(sizeof(struct ll_node));
-    struct ll_node *p10 = (struct ll_node *)malloc(sizeof(struct ll_node));
-    struct ll_node *p15 = (struct ll_node *)malloc(sizeof(struct ll_node));
-    struct ll_node *p30 = (struct ll_node *)malloc(sizeof(struct ll_node));
+    ll_node_t *p1 = (ll_node_t *)malloc(sizeof(ll_node_t));
+    ll_node_t *p2 = (ll_node_t *)malloc(sizeof(ll_node_t));
+    ll_node_t *p3 = (ll_node_t *)malloc(sizeof(ll_node_t));
+    ll_node_t *p4 = (ll_node_t *)malloc(sizeof(ll_node_t));
+    ll_node_t *p5 = (ll_node_t *)malloc(sizeof(ll_node_t));
+    ll_node_t *p6 = (ll_node_t *)malloc(sizeof(ll_node_t));
 
-    p3->value = 3;
-    p3->next = p6;
+    p1->val = 123;
+    p1->next = p2;
 
-    p6->value = 6;
-    p6->next = p9;
+    p2->val = 119;
+    p2->next = p3;
 
-    p9->value = 9;
-    p9->next = p15;
+    p3->val = 96;
+    p3->next = p4;
 
-    p10->value = 10;
-    p10->next = p15;
+    p4->val = 90;
+    p4->next = p5;
 
-    p15->value = 15;
-    p15->next = p30;
+    p5->val = 10;
+    p5->next = p6;
 
-    p30->value = 30;
-    p30->next = NULL;
+    p6->val = 7;
+    p6->next = NULL;
 
-    // struct ll_node *list1=p10, *list2=p6;
-    struct ll_node *list1=NULL, *list2=NULL;
+    void print_list(ll_node_t*);
 
-    struct ll_node *intersection;
+    print_list(p1);
+    ll_node_t *sorted = ll_sort(p1, 1);
+    print_list(sorted);
 
-    intersection = FindIntersection(list1, list2);
-    if (NULL != intersection) printf("value at intersection = %d\n", intersection->value);
+}
 
-    intersection = FindIntersection2(list1, list2);
-    if (NULL != intersection) printf("value at intersection = %d\n", intersection->value);
-
-    intersection = FindIntersection3(list1, list2);
-    if (NULL != intersection) printf("value at intersection = %d\n", intersection->value);
+void print_list(ll_node_t *list)
+{
+    while (list != NULL) {
+        printf("value = %d\n", list->val);
+        list = list->next;
+    }
 }

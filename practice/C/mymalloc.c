@@ -33,6 +33,8 @@ unsigned qhead = 0, qtail = 0;
 
 void read_from_queue(unsigned count)
 {
+    puts(__FUNCTION__);
+    
     printf("read_from_queue: count=%u\n", count);
     for (unsigned i = 0; i < count; i++)
     {
@@ -56,7 +58,7 @@ void add_to_queue(const char *input_string, unsigned size)
     {
         puts("full queue");
         // prefer to lose old entries than ignore new ones
-        free(string_queue[head]);
+        free(string_queue[qhead]);
         qhead = (qhead + 1) % QUEUE_SIZE;
     }
     string_queue[qtail] = entry;

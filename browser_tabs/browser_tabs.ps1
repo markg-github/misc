@@ -1,6 +1,4 @@
 
-
-
 <#
   .SYNOPSIS
   Show open and closed Edge (browser) Workspaces.
@@ -15,7 +13,7 @@
 #>
 
 param (
-    [string] $workspace,
+    # [string] $workspace,
     [string] $workspace_directory = "$env:LOCALAPPDATA\Microsoft\Edge\User Data",
     [string] $workspace_profile = "Default",
     [string] $workspace_cachefile = "Workspaces\WorkspacesCache",
@@ -23,6 +21,8 @@ param (
     [int] $max_count = 100,
     [switch] $sortbycount = $false
 )
+
+
 
 # one error at a time
 # comment out to keep running after error

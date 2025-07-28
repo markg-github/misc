@@ -16,6 +16,10 @@ def merge_sorted(l1, l2):
             merged_list.append(l2[index2])
             index2 += 1
 
+    # this is the subtle part. why does it work?
+    # two cases: we're at the end of l1 or at the end of l2
+    # in either case one of the extends won't do anything and
+    # the other will extend with values that are all higher
     merged_list.extend(l1[index1:])
     merged_list.extend(l2[index2:])
 
