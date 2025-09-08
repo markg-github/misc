@@ -14,26 +14,9 @@
 #include <iomanip>
 #include <vector>
 
-enum class Format
-{
-    Hex,
-    Dec
-};
+#include "parse-cbor.h"
 
-#define APP_X509_BUFF_LEN (1024 * 2)
-#define APP_ATTDOC_BUFF_LEN (1024 * 10)
-
-void syntactic_validation(const unsigned char *);
-void cbor_worker(const cbor_item_t *);
-void parse_cbor_map(const cbor_item_t *);
-void parse_cbor_array(const cbor_item_t *);
-void parse_cbor_bytestring(const cbor_item_t *);
-void parse_cbor_tag(const cbor_item_t *);
-void print_buffer(const unsigned char *buffer, size_t size, Format format = Format::Hex);
-int read_file(unsigned char *file, char *file_name, size_t elements);
-void instrument(const char *name, cbor_item_t *cbor_item);
-
-int gverbose = 0;
+static int gverbose = 1;
 
 void parse_pointer(const unsigned char *cbor_buffer, int cbor_buffer_length)
 {
@@ -61,6 +44,8 @@ void print_buffer(const unsigned char *buffer, size_t size, Format format)
 
     for (size_t i = 0; i < size; ++i)
     {
+        if (i >= 64)
+            break;
         // Print the offset at the beginning of each line
         if (i % 16 == 0)
         {
@@ -156,7 +141,7 @@ void parse_cbor_tag(const cbor_item_t *cbor_tag)
     uint64_t tag = cbor_tag_value(cbor_tag);
     if (gverbose)
     {
-        fprintf(stdout, "value: %lux hex, %lu decimal \n", tag, tag);
+        fprintf(stdout, "value: %lx hex, %lu decimal \n", tag, tag);
     }
     cbor_item_t *tagged = cbor_tag_item(cbor_tag);
     cbor_worker(tagged);
@@ -193,7 +178,7 @@ void cbor_worker(const cbor_item_t *cbor_item)
         uint64_t val = cbor_get_int(cbor_item);
         if (gverbose)
         {
-            fprintf(stdout, "UINT: %lux hex, %lu decimal \n", val, val);
+            fprintf(stdout, "UINT: %lx hex, %lu decimal \n", val, val);
         }
         break;
     }
@@ -204,7 +189,7 @@ void cbor_worker(const cbor_item_t *cbor_item)
         // Note: actual value is -1 - abs_val
         if (gverbose)
         {
-            fprintf(stdout, "NEGINT: %lux hex, %lu decimal \n", abs_val, abs_val);
+            fprintf(stdout, "NEGINT: %lx hex, %lu decimal \n", abs_val, abs_val);
         }
         break;
     }
@@ -304,4 +289,3 @@ void instrument(const char *name, cbor_item_t *cbor_item)
         cbor_describe(cbor_item, stdout);
     }
 }
-
