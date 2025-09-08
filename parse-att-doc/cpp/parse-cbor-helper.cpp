@@ -20,17 +20,23 @@ static int gverbose = 1;
 
 void parse_pointer(const unsigned char *cbor_buffer, int cbor_buffer_length)
 {
+    if (gverbose)
+    {
+        fprintf(stdout, "%s: cbor_buffer = %p, cbor_buffer_length = %d \n", __FUNCTION__, cbor_buffer, cbor_buffer_length);
+    }
+
     // Parse buffer using library
     struct cbor_load_result load_result;
     cbor_item_t *cbor_item = cbor_load(cbor_buffer, cbor_buffer_length, &load_result);
+    int *p_int = (int *)&(load_result.error);
     if (gverbose)
     {
-        int *p_int = (int *)&(load_result.error);
         printf("Error code: %d\n", *p_int);
+        printf("cbor_item: %p\n", cbor_item);
+        printf("load_result.read: %zu\n", load_result.read);
     }
-    if (NULL == cbor_item)
+    if ((NULL == cbor_item) || (0 != *p_int) || (load_result.read != cbor_buffer_length))
     {
-        puts(__FUNCTION__);
         print_buffer(cbor_buffer, cbor_buffer_length);
         return;
     }
@@ -53,7 +59,7 @@ void print_buffer(const unsigned char *buffer, size_t size, Format format)
             {
                 std::cout << '\n';
             }
-            std::cout << std::setw(4) << std::setfill('0') << std::right << std::dec << i << ": ";
+            std::cout << std::setw(4) << std::setfill('0') << std::right << std::hex << i << ": ";
         }
 
         // Print the byte value in the selected format
@@ -121,6 +127,10 @@ void parse_cbor_array(const cbor_item_t *cbor_array)
     }
 
     size_t array_size = cbor_array_size(cbor_array);
+    if (gverbose)
+    {
+        fprintf(stdout, "%s: array_size = %zu \n", __FUNCTION__, array_size);
+    }
 
     for (size_t i = 0; i < array_size; i++)
     {
@@ -128,7 +138,7 @@ void parse_cbor_array(const cbor_item_t *cbor_array)
         // Check type
         enum cbor_type type = cbor_typeof(element);
 
-        if (gverbose)
+        if (false && gverbose)
         {
             printf("element %zu - type: %d\n", i, type);
         }
@@ -150,6 +160,11 @@ void parse_cbor_tag(const cbor_item_t *cbor_tag)
 void parse_cbor_map(const cbor_item_t *cbor_map)
 {
     size_t map_size = cbor_map_size(cbor_map);
+    if (gverbose)
+    {
+        fprintf(stdout, "%s: map_size = %zu \n", __FUNCTION__, map_size);
+    }
+
     struct cbor_pair *pairs = cbor_map_handle(cbor_map);
 
     for (size_t i = 0; i < map_size; i++)
@@ -161,9 +176,13 @@ void parse_cbor_map(const cbor_item_t *cbor_map)
 
         if (gverbose)
         {
-            printf("%s: Pair %zu - Key type: %d, Value type: %d\n", __FUNCTION__, i, key_type, value_type);
+            printf("%s: Pair %zu - Key type: %d\n", __FUNCTION__, i, key_type);
         }
         cbor_worker(pairs[i].key);
+        if (gverbose)
+        {
+            printf("%s: Pair %zu - Value type: %d\n", __FUNCTION__, i, value_type);
+        }
         cbor_worker(pairs[i].value);
     }
 }
